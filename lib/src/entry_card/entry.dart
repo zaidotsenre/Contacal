@@ -1,8 +1,7 @@
 class Entry {
-  int entryID;
+  int id;
   int calories;
-  int quantity;
   String? name;
 
-  Entry(this.entryID, this.calories, this.quantity, String? name);
+  Entry({required this.id, required this.calories, this.name});
 }
