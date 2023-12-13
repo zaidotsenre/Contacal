@@ -1,5 +1,6 @@
 import 'package:contacal/src/entry_card/entry.dart';
 import 'package:contacal/src/entry_card/entry_list_view.dart';
+import 'package:contacal/src/entry_form.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a list of SampleItems.
@@ -21,59 +22,98 @@ class EntryCardView extends StatelessWidget {
       // builds Widgets as they’re scrolled into view.
       body: Center(
         child: FractionallySizedBox(
-          widthFactor: 0.8,
-          heightFactor: 0.95,
+          widthFactor: 1,
+          heightFactor: 1,
           child: Column(
             children: [
               Container(
                   color: Colors.blueAccent,
-                  height: 100,
+                  height: 150,
                   width: double.maxFinite,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FloatingActionButton(
-                              onPressed: null,
-                              child: Icon(Icons.directions_run))
-                        ],
+                  child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 30,
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(
-                            "500",
-                            style: TextStyle(fontSize: 40),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FloatingActionButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return const Wrap(
+                                          children: [
+                                            EntryForm(),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Icon(Icons.directions_run))
+                            ],
                           ),
-                          Text(
-                            "1500",
-                            style: TextStyle(fontSize: 20),
+                          const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "500",
+                                style: TextStyle(fontSize: 40),
+                              ),
+                              Text(
+                                "1500",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FloatingActionButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return const Wrap(
+                                          children: [
+                                            EntryForm(),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: const Icon(Icons.fastfood))
+                            ],
                           ),
                         ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FloatingActionButton(
-                              onPressed: null, child: Icon(Icons.fastfood))
-                        ],
-                      ),
-                    ],
-                  )),
+                      ))),
               Expanded(
                   child: Container(
                       color: Colors.black12,
                       child: EntryListView(
                         entries: [
-                          Entry(id: 1, calories: 500, name: "bread"),
-                          Entry(id: 1, calories: 500, name: "bread"),
-                          Entry(id: 1, calories: 500, name: "bread")
+                          Entry(
+                              id: 1,
+                              calories: 500,
+                              date: DateTime.now(),
+                              name: "bread"),
+                          Entry(
+                              id: 1,
+                              calories: 500,
+                              date: DateTime.now(),
+                              name: "bread"),
+                          Entry(
+                              id: 1,
+                              calories: 500,
+                              date: DateTime.now(),
+                              name: "bread"),
                         ],
                       ))),
               Container(
@@ -81,7 +121,9 @@ class EntryCardView extends StatelessWidget {
                   color: Colors.blueAccent,
                   height: 50,
                   width: double.maxFinite,
-                  child: const Center(child: Text("12/25/2023")))
+                  child: Center(
+                      child:
+                          Text(DateUtils.dateOnly(DateTime.now()).toString())))
             ],
           ),
         ),
