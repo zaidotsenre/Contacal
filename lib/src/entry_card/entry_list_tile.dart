@@ -1,19 +1,23 @@
-import 'package:contacal/src/entry_card/entry.dart';
 import 'package:flutter/material.dart';
+import '../db_helper.dart';
 
 class EntryListTile extends StatelessWidget {
-  final Entry? entry;
+  final Map<String, dynamic> entry;
+  final Function? onDelete;
 
-  const EntryListTile({super.key, this.entry});
+  const EntryListTile({super.key, required this.entry, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-        leading: Text(entry?.calories.toString() ?? ''),
-        title: Text(entry?.name ?? ''),
+        leading: Text(entry['calories'].toString()),
+        title: Text(entry['name'] ?? ''),
         trailing: FloatingActionButton.small(
-          onPressed: null,
-          child: Icon(Icons.delete),
+          onPressed: () {
+            DBHelper.deleteEntry(entry['id']);
+            onDelete!.call();
+          },
+          child: const Icon(Icons.delete),
         ));
   }
 }

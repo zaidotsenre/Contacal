@@ -14,7 +14,11 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  path: ^1.8.3
+  path_provider: ^2.1.1
   sqflite: ^2.3.0
+  sqflite_common_ffi: any
+  sqlite3_flutter_libs: any
 
 dev_dependencies:
   flutter_test:
@@ -31,3 +35,4 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+    - assets/contacal.db

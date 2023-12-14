@@ -1,25 +1,70 @@
-import 'package:contacal/src/entry_card/entry.dart';
-import 'package:contacal/src/entry_card/entry_list_view.dart';
 import 'package:contacal/src/entry_form.dart';
 import 'package:flutter/material.dart';
 
+import '../db_helper.dart';
+import 'entry_list_tile.dart';
+
 /// Displays a list of SampleItems.
-class EntryCardView extends StatelessWidget {
-  const EntryCardView({
-    super.key,
-  });
+class EntryCardView extends StatefulWidget {
+  const EntryCardView({super.key});
 
   static const routeName = '/';
 
   @override
+  State<StatefulWidget> createState() => EntryCardViewState();
+}
+
+class EntryCardViewState extends State<EntryCardView> {
+  List<Map<String, dynamic>> _entries = [];
+
+  showNewEntryForm() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            EntryForm(
+              onSubmit: () {
+                Navigator.pop(context);
+                updateView();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<EntryListTile> buildListTiles() {
+    List<EntryListTile> tiles = [];
+    for (var entry in _entries) {
+      final tile = EntryListTile(
+        entry: entry,
+        onDelete: () {
+          updateView();
+        },
+      );
+      tiles.add(tile);
+    }
+    return tiles;
+  }
+
+  updateView() async {
+    final data = await DBHelper.getAllEntries();
+    setState(() {
+      _entries = data;
+    });
+  }
+
+  @override
+  void initState() {
+    updateView();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
       body: Center(
         child: FractionallySizedBox(
           widthFactor: 1,
@@ -42,20 +87,12 @@ class EntryCardView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              // Button to add exercise entry
                               FloatingActionButton(
                                   onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return const Wrap(
-                                          children: [
-                                            EntryForm(),
-                                          ],
-                                        );
-                                      },
-                                    );
+                                    showNewEntryForm();
                                   },
-                                  child: Icon(Icons.directions_run))
+                                  child: const Icon(Icons.directions_run))
                             ],
                           ),
                           const Column(
@@ -76,18 +113,10 @@ class EntryCardView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              // Button to add food entry
                               FloatingActionButton(
                                   onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return const Wrap(
-                                          children: [
-                                            EntryForm(),
-                                          ],
-                                        );
-                                      },
-                                    );
+                                    showNewEntryForm();
                                   },
                                   child: const Icon(Icons.fastfood))
                             ],
@@ -97,25 +126,7 @@ class EntryCardView extends StatelessWidget {
               Expanded(
                   child: Container(
                       color: Colors.black12,
-                      child: EntryListView(
-                        entries: [
-                          Entry(
-                              id: 1,
-                              calories: 500,
-                              date: DateTime.now(),
-                              name: "bread"),
-                          Entry(
-                              id: 1,
-                              calories: 500,
-                              date: DateTime.now(),
-                              name: "bread"),
-                          Entry(
-                              id: 1,
-                              calories: 500,
-                              date: DateTime.now(),
-                              name: "bread"),
-                        ],
-                      ))),
+                      child: ListView(children: buildListTiles()))),
               Container(
                   //constraints: const BoxConstraints.expand(height: 100),
                   color: Colors.blueAccent,

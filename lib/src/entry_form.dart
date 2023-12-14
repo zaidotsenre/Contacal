@@ -1,9 +1,12 @@
+import 'package:contacal/src/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Define a custom Form widget.
 class EntryForm extends StatefulWidget {
-  const EntryForm({super.key});
+  final Function? onSubmit;
+  final Map<String, dynamic>? entry;
+  const EntryForm({super.key, this.onSubmit, this.entry});
 
   @override
   EntryFormState createState() {
@@ -11,15 +14,41 @@ class EntryForm extends StatefulWidget {
   }
 }
 
-// Define a corresponding State class.
-// This class holds data related to the form.
 class EntryFormState extends State<EntryForm> {
-  // Create a global key that uniquely identifies the Form widget
-  // and allows validation of the form.
-  //
-  // Note: This is a `GlobalKey<FormState>`,
-  // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
+  String? _name;
+  int? _calories;
+
+  @override
+  void initState() {
+    if (widget.entry != null) {
+      _name = widget.entry!['name'];
+      _calories = widget.entry!['calories'];
+    }
+    super.initState();
+  }
+
+  /// Returns empty string if [number] is null. Returns a the value as a String
+  /// ohterwise.
+  String nullCheck(int? number) {
+    return number == null ? '' : number.toString();
+  }
+
+  /// Creates a new row in the entries database using the form's current state.
+  /// Calls onSubmit
+  submit() {
+    final date = widget.entry != null
+        ? widget.entry!['date']
+        : DateTime.now().toString();
+
+    Map<String, dynamic> newEntry = {
+      'calories': _calories,
+      'name': _name,
+      'date': date
+    };
+    DBHelper.saveEntry(newEntry);
+    widget.onSubmit!.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,20 +64,29 @@ class EntryFormState extends State<EntryForm> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  // Calories input field
                   TextFormField(
-                    // The validator receives the text that the user has entered.
+                    initialValue: nullCheck(_calories),
+                    onSaved: (value) {
+                      _calories = int.parse(value!);
+                    },
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(hintText: "Calories"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter the number of calories';
                       }
                       return null;
                     },
                   ),
                   // Name input field
                   TextFormField(
-                    // The validator receives the text that the user has entered.
+                    initialValue: _name ?? '',
+                    onSaved: (value) {
+                      _name = value;
+                    },
+                    decoration: const InputDecoration(hintText: "Description"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -59,16 +97,14 @@ class EntryFormState extends State<EntryForm> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Processing Data')),
-                        );
+                        _formKey.currentState!.save();
+                        submit();
                       }
                     },
                     child: const Text('Submit'),
                   ),
                 ]),
           )
-          // Calories input field
         ],
       ),
     );
