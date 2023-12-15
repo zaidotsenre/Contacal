@@ -7,8 +7,13 @@ class EntryForm extends StatefulWidget {
   final Function? onSubmit;
   final DateTime selectedDate;
   final Map<String, dynamic>? entry;
+  final bool exercise;
   const EntryForm(
-      {super.key, this.onSubmit, this.entry, required this.selectedDate});
+      {super.key,
+      this.onSubmit,
+      this.entry,
+      required this.selectedDate,
+      this.exercise = false});
 
   @override
   EntryFormState createState() {
@@ -42,6 +47,10 @@ class EntryFormState extends State<EntryForm> {
     final date = widget.entry != null
         ? widget.entry!['date']
         : DateUtils.dateOnly(widget.selectedDate).toString();
+
+    if (widget.exercise) {
+      _calories = _calories! * -1;
+    }
 
     Map<String, dynamic> newEntry = {
       'calories': _calories,

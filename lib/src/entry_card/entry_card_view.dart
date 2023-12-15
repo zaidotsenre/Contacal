@@ -1,3 +1,4 @@
+import 'package:contacal/src/calorie_goal_form.dart';
 import 'package:contacal/src/entry_form.dart';
 import 'package:flutter/material.dart';
 
@@ -16,16 +17,18 @@ class EntryCardView extends StatefulWidget {
 
 class EntryCardViewState extends State<EntryCardView> {
   List<Map<String, dynamic>> _entries = [];
+  int _dailyCalorieGoal = 0;
   DateTime _selectedDate = DateUtils.dateOnly(DateTime.now());
 
   /// Displays the form to add and edit entries
-  showNewEntryForm() {
+  showNewEntryForm({bool exercise = false}) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return Wrap(
           children: [
             EntryForm(
+              exercise: exercise,
               selectedDate: _selectedDate,
               onSubmit: () {
                 Navigator.pop(context);
@@ -65,8 +68,11 @@ class EntryCardViewState extends State<EntryCardView> {
   /// Reads from the database and updates the view
   updateView() async {
     final data = await DBHelper.getEntriesByDate(_selectedDate);
+    final calGoal = await DBHelper.getSetting('dailyCalorieGoal');
+
     setState(() {
       _entries = data;
+      _dailyCalorieGoal = calGoal;
     });
   }
 
@@ -136,7 +142,7 @@ class EntryCardViewState extends State<EntryCardView> {
                               // Button to add exercise entry
                               FloatingActionButton(
                                   onPressed: () {
-                                    showNewEntryForm();
+                                    showNewEntryForm(exercise: true);
                                   },
                                   child: const Icon(Icons.directions_run))
                             ],
@@ -149,10 +155,30 @@ class EntryCardViewState extends State<EntryCardView> {
                                 dailyTotalCalories(),
                                 style: const TextStyle(fontSize: 40),
                               ),
-                              const Text(
-                                "1500",
-                                style: TextStyle(fontSize: 20),
-                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return Wrap(
+                                          children: [
+                                            CalorieGoalForm(
+                                              dailyCalorieGoal:
+                                                  _dailyCalorieGoal,
+                                              onSubmit: () {
+                                                Navigator.pop(context);
+                                                updateView();
+                                              },
+                                            )
+                                          ],
+                                        );
+                                      });
+                                },
+                                child: Text(
+                                  _dailyCalorieGoal.toString(),
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                              )
                             ],
                           ),
                           Column(

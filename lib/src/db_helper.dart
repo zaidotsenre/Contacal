@@ -11,10 +11,9 @@ class DBHelper {
         join((await getApplicationDocumentsDirectory()).path, 'contacal.db');
 
     Directory(dirname(dbPath)).create(recursive: true);
-
-    return openDatabase(dbPath, onCreate: (db, version) {
-      db.execute(
-        """CREATE TABLE "entries" (
+    return openDatabase(dbPath, onCreate: (db, version) async {
+      await db.execute(
+        """CREATE TABLE entries (
           "id"	INTEGER NOT NULL UNIQUE,
           "name"	TEXT,
           "calories"	INTEGER NOT NULL,
@@ -23,7 +22,29 @@ class DBHelper {
         );
         """,
       );
+      await db.execute(
+        """CREATE TABLE settings (
+          "key"	TEXT NOT NULL UNIQUE,
+          "value"	INTEGER NOT NULL,
+          PRIMARY KEY("key")
+        );
+        """,
+      );
+      await db.insert('settings', {'key': 'dailyCalorieGoal', 'value': 2000},
+          conflictAlgorithm: ConflictAlgorithm.replace);
     }, version: 1);
+  }
+
+  static Future<void> saveSetting(Map<String, dynamic> setting) async {
+    final db = await openDB();
+    db.insert('settings', setting,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  static Future<dynamic> getSetting(String key) async {
+    final db = await openDB();
+    final data = await db.query('settings', where: 'key=?', whereArgs: [key]);
+    return data[0]['value'];
   }
 
   /// Returns all the rows in the entries table
