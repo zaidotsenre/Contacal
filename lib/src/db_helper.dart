@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -35,7 +36,8 @@ class DBHelper {
   static Future<List<Map<String, dynamic>>> getEntriesByDate(
       DateTime date) async {
     final db = await openDB();
-    return db.query('entries', where: 'date=?', whereArgs: [date.toString()]);
+    return db.query('entries',
+        where: 'date=?', whereArgs: [DateUtils.dateOnly(date).toString()]);
   }
 
   /// Inserts [entry] into the database or updates it if it already exists

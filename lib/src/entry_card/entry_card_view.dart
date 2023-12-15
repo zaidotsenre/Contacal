@@ -16,7 +16,9 @@ class EntryCardView extends StatefulWidget {
 
 class EntryCardViewState extends State<EntryCardView> {
   List<Map<String, dynamic>> _entries = [];
+  DateTime _selectedDate = DateUtils.dateOnly(DateTime.now());
 
+  /// Displays the form to add and edit entries
   showNewEntryForm() {
     showModalBottomSheet(
       context: context,
@@ -24,6 +26,7 @@ class EntryCardViewState extends State<EntryCardView> {
         return Wrap(
           children: [
             EntryForm(
+              selectedDate: _selectedDate,
               onSubmit: () {
                 Navigator.pop(context);
                 updateView();
@@ -35,6 +38,7 @@ class EntryCardViewState extends State<EntryCardView> {
     );
   }
 
+  /// Returns a List of tiles with the contents of the current state
   List<EntryListTile> buildListTiles() {
     List<EntryListTile> tiles = [];
     for (var entry in _entries) {
@@ -49,11 +53,37 @@ class EntryCardViewState extends State<EntryCardView> {
     return tiles;
   }
 
+  ///Calculates daily total calories and returns the result as a string
+  String dailyTotalCalories() {
+    int total = 0;
+    for (var entry in _entries) {
+      total += entry['calories'] as int;
+    }
+    return total.toString();
+  }
+
+  /// Reads from the database and updates the view
   updateView() async {
-    final data = await DBHelper.getAllEntries();
+    final data = await DBHelper.getEntriesByDate(_selectedDate);
     setState(() {
       _entries = data;
     });
+  }
+
+  /// Formats the [date] to be displayed in the bottom bar. Returns a string
+  formatDate(DateTime date) {
+    final today = DateUtils.dateOnly(DateTime.now());
+    date = DateUtils.dateOnly(date);
+    final difference = today.difference(date);
+
+    switch (difference.inDays) {
+      case 0:
+        return 'Today';
+      case 1:
+        return 'Yesterday';
+      default:
+        return '${date.toLocal().month}/${date.toLocal().day}/${date.toLocal().year}';
+    }
   }
 
   @override
@@ -65,7 +95,23 @@ class EntryCardViewState extends State<EntryCardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+        body: GestureDetector(
+      onPanEnd: (details) {
+        // Decrease selected date when user swipes right.
+        if (details.velocity.pixelsPerSecond.dx > 1) {
+          _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+          updateView();
+        }
+        // Increase selected date when user swipes right.
+        if (details.velocity.pixelsPerSecond.dx < 1) {
+          // Date should not exceed today's date
+          if (DateTime.now().difference(_selectedDate).inDays > 0) {
+            _selectedDate = _selectedDate.add(const Duration(days: 1));
+            updateView();
+          }
+        }
+      },
+      child: Center(
         child: FractionallySizedBox(
           widthFactor: 1,
           heightFactor: 1,
@@ -95,15 +141,15 @@ class EntryCardViewState extends State<EntryCardView> {
                                   child: const Icon(Icons.directions_run))
                             ],
                           ),
-                          const Column(
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "500",
-                                style: TextStyle(fontSize: 40),
+                                dailyTotalCalories(),
+                                style: const TextStyle(fontSize: 40),
                               ),
-                              Text(
+                              const Text(
                                 "1500",
                                 style: TextStyle(fontSize: 20),
                               ),
@@ -132,13 +178,11 @@ class EntryCardViewState extends State<EntryCardView> {
                   color: Colors.blueAccent,
                   height: 50,
                   width: double.maxFinite,
-                  child: Center(
-                      child:
-                          Text(DateUtils.dateOnly(DateTime.now()).toString())))
+                  child: Center(child: Text(formatDate(_selectedDate))))
             ],
           ),
         ),
       ),
-    );
+    ));
   }
 }

@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 // Define a custom Form widget.
 class EntryForm extends StatefulWidget {
   final Function? onSubmit;
+  final DateTime selectedDate;
   final Map<String, dynamic>? entry;
-  const EntryForm({super.key, this.onSubmit, this.entry});
+  const EntryForm(
+      {super.key, this.onSubmit, this.entry, required this.selectedDate});
 
   @override
   EntryFormState createState() {
@@ -39,7 +41,7 @@ class EntryFormState extends State<EntryForm> {
   submit() {
     final date = widget.entry != null
         ? widget.entry!['date']
-        : DateTime.now().toString();
+        : DateUtils.dateOnly(widget.selectedDate).toString();
 
     Map<String, dynamic> newEntry = {
       'calories': _calories,
