@@ -1,6 +1,7 @@
 import 'package:contacal/src/calorie_log/goal_form.dart';
 import 'package:contacal/src/calorie_log/calorie_log_controller.dart';
 import 'package:contacal/src/calorie_log/log_form.dart';
+import 'package:contacal/src/calorie_log/style.dart';
 import 'package:flutter/material.dart';
 
 import 'entry_list_tile.dart';
@@ -20,6 +21,8 @@ class CalorieLogViewState extends State<CalorieLogView> {
   /// Displays the form to add and edit entries
   showNewEntryForm({bool exercise = false}) {
     showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Style.secondaryColor,
       context: context,
       builder: (context) {
         return LogForm(
@@ -27,7 +30,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
           onSubmit: (calories, name) {
             widget.controller.logCalories(calories, name).then((value) {
               Navigator.pop(context);
-              updateView();
+              setState(() {});
             });
           },
         );
@@ -44,7 +47,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
         onDelete: (id) {
           widget.controller.deleteLog(id).then(
             (value) {
-              updateView();
+              setState(() {});
             },
           );
         },
@@ -54,33 +57,24 @@ class CalorieLogViewState extends State<CalorieLogView> {
     return tiles;
   }
 
-  /// Reads from the database and updates the view
-  updateView() {
-    setState(() {});
-    print("LOG: Updated view.");
-  }
-
-  @override
-  void initState() {
-    updateView();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Style.primaryColor,
         resizeToAvoidBottomInset: true,
         body: GestureDetector(
           onPanEnd: (details) {
             // Decrease selected date when user swipes right.
             if (details.velocity.pixelsPerSecond.dx > 1) {
-              widget.controller.previousDay();
-              updateView();
+              widget.controller.previousDay().then((value) {
+                setState(() {});
+              });
             }
             // Increase selected date when user swipes right.
             if (details.velocity.pixelsPerSecond.dx < 1) {
-              widget.controller.nextDay();
-              updateView();
+              widget.controller.nextDay().then((value) {
+                setState(() {});
+              });
             }
           },
           child: Center(
@@ -90,7 +84,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
               child: Column(
                 children: [
                   Container(
-                      color: Colors.blueAccent,
+                      color: Style.secondaryColor,
                       height: 150,
                       width: double.maxFinite,
                       child: Padding(
@@ -107,6 +101,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
                                 children: [
                                   // Button to add exercise entry
                                   FloatingActionButton(
+                                      backgroundColor: Style.buttonColor,
                                       onPressed: () {
                                         showNewEntryForm(exercise: true);
                                       },
@@ -124,6 +119,8 @@ class CalorieLogViewState extends State<CalorieLogView> {
                                   GestureDetector(
                                     onTap: () {
                                       showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          backgroundColor: Style.secondaryColor,
                                           context: context,
                                           builder: (context) {
                                             return GoalForm(
@@ -133,7 +130,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
                                                 widget.controller.dailyGoal =
                                                     value;
                                                 Navigator.pop(context);
-                                                updateView();
+                                                setState(() {});
                                               },
                                             );
                                           });
@@ -151,6 +148,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
                                 children: [
                                   // Button to add food entry
                                   FloatingActionButton(
+                                      backgroundColor: Style.buttonColor,
                                       onPressed: () {
                                         showNewEntryForm();
                                       },
@@ -164,8 +162,7 @@ class CalorieLogViewState extends State<CalorieLogView> {
                           color: Colors.black12,
                           child: ListView(children: buildListTiles()))),
                   Container(
-                      //constraints: const BoxConstraints.expand(height: 100),
-                      color: Colors.blueAccent,
+                      color: Style.secondaryColor,
                       height: 50,
                       width: double.maxFinite,
                       child: Center(

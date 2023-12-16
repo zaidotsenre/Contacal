@@ -1,7 +1,7 @@
+import 'package:contacal/src/calorie_log/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Define a custom Form widget.
 class GoalForm extends StatefulWidget {
   final Function? onSubmit;
   final int currentValue;
@@ -36,30 +36,39 @@ class GoalFormState extends State<GoalForm> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Calories input field
-                TextFormField(
-                  initialValue: _dailyGoal.toString(),
-                  onSaved: (value) {
-                    _dailyGoal = int.parse(value!);
-                  },
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(hintText: "Daily Goal"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your daily goal.';
-                    }
-                    return null;
-                  },
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: TextFormField(
+                    initialValue: _dailyGoal.toString(),
+                    onSaved: (value) {
+                      _dailyGoal = int.parse(value!);
+                    },
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(hintText: "Daily Goal"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your daily goal.';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
+
                 // Name input field
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      widget.onSubmit!.call(_dailyGoal);
-                    }
-                  },
-                  child: const Text('Submit'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: FloatingActionButton(
+                    backgroundColor: Style.buttonColor,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        widget.onSubmit!.call(_dailyGoal);
+                      }
+                    },
+                    child: const Icon(Icons.add),
+                  ),
                 ),
               ]),
         ));

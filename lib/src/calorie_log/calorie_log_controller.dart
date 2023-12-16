@@ -22,11 +22,6 @@ class CalorieLogController {
   }
 
   // Setters
-  set date(DateOnly value) {
-    _date = value;
-    loadData();
-  }
-
   set dailyGoal(int value) {
     _dailyGoal = value;
     DBService.setDailyGoal(value);
@@ -50,9 +45,9 @@ class CalorieLogController {
   Future<void> loadData() async {
     _entries = await DBService.getEntriesByDate(_date);
     _dailyGoal = await DBService.getDailyGoal();
-    print("LOG: Loaded data.");
   }
 
+  /// Creates a new log entry with values [calories] and  [name]
   Future<void> logCalories(calories, name) async {
     Map<String, dynamic> newEntry = {
       'calories': calories,
@@ -63,6 +58,7 @@ class CalorieLogController {
     await loadData();
   }
 
+  /// Deletes the log entry with a matching [id]
   Future<void> deleteLog(id) async {
     await DBService.deleteEntry(id);
     await loadData();

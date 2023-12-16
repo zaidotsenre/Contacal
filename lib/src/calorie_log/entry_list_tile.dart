@@ -1,3 +1,4 @@
+import 'package:contacal/src/calorie_log/style.dart';
 import 'package:flutter/material.dart';
 
 class EntryListTile extends StatelessWidget {
@@ -9,9 +10,10 @@ class EntryListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-        leading: Text(entry['calories'].toString()),
-        title: Text(entry['name'] ?? ''),
+        title: Text(entry['calories'].toString()),
+        subtitle: Text(entry['name'] ?? ''),
         trailing: FloatingActionButton.small(
+          backgroundColor: Style.buttonColor,
           onPressed: () {
             onDelete!.call(entry['id']);
           },
