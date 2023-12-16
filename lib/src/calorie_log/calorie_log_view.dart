@@ -1,5 +1,4 @@
 import 'package:contacal/src/calorie_log/goal_form.dart';
-import 'package:contacal/src/date_only.dart';
 import 'package:contacal/src/calorie_log/calorie_log_controller.dart';
 import 'package:contacal/src/calorie_log/log_form.dart';
 import 'package:flutter/material.dart';
