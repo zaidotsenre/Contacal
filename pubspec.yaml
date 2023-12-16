@@ -12,6 +12,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
   flutter_localizations:
     sdk: flutter
   path: ^1.8.3
@@ -36,3 +37,8 @@ flutter:
     # Add assets from the images directory to the application.
     - assets/images/
     - assets/contacal.db
+
+
+flutter_launcher_icons:
+  image_path: assets/images/icon.png
+  android: ture
