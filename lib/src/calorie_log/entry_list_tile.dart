@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../db_helper.dart';
 
 class EntryListTile extends StatelessWidget {
   final Map<String, dynamic> entry;
@@ -14,8 +13,7 @@ class EntryListTile extends StatelessWidget {
         title: Text(entry['name'] ?? ''),
         trailing: FloatingActionButton.small(
           onPressed: () {
-            DBHelper.deleteEntry(entry['id']);
-            onDelete!.call();
+            onDelete!.call(entry['id']);
           },
           child: const Icon(Icons.delete),
         ));
